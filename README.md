@@ -1,30 +1,34 @@
 # Translation Corpus Viewer
 
-在本地浏览、搜索、编辑和校验双语词条，支持 JSONL 和 CSV。页面在浏览器内读取你选择的文件，编辑暂存在当前页面，导出后由你保存。
+Browse, search, edit, and validate bilingual entries in local JSONL and CSV files. The public edition runs entirely in your browser. It also includes [interface declarations](contracts/full-tool.d.ts) for the full edition's catalog, crawler tasks, corpus API, and submission workflow.
 
-## 使用
+## Quick start
 
-1. 下载并解压仓库，双击打开项目根目录的 `index.html`。
-2. 导入 [JSONL 虚构样例](examples/fictional.jsonl)、[CSV 虚构样例](examples/fictional.csv)，或选择你的本地文件。
-3. 搜索或筛选词条，编辑译文并查看空译文、占位符和标记提示。
-4. 导出 JSONL 或 CSV 保存整份语料。搜索和筛选只影响当前显示。重新打开页面时，导入导出的文件即可继续编辑。
+1. Download and unzip this repository, then open `index.html` in your browser.
+2. Import the fictional [JSONL](examples/fictional.jsonl) or [CSV](examples/fictional.csv) example, or select a local file.
+3. Search or filter entries, edit translations, and review alerts about empty translations, placeholders, and markup.
+4. Export the full corpus as JSONL or CSV. Reopen the exported file to continue editing later.
 
-页面运行无需安装依赖、登录账号或启动服务。导出文件会出现在浏览器的下载位置。
+The browser needs no installation, login, or local server. Edits stay in the current page until you save an export. Search and filters affect the display only.
 
-## 文件格式
+## Public and full editions
 
-JSONL 每行一个对象，CSV 第一条记录为表头。两种格式均以 UTF-8 编码，使用 id、context、source、target 四个字段。source 为必填原文，其余字段可省略。工具只保留这四个字段。空译文以及占位符或标记的差异会在表格中标出。
+The public app provides the local file workflow. The full edition adds a module catalog, crawl tasks, disk-backed corpora and snapshots, and a submission workflow. The public repository preserves those integration points as type declarations and reference documentation. Open the [edition comparison and interface reference](docs/full-tool.md) for the command names, local routes, and coverage by feature.
 
-CSV 导出会给可能被电子表格解释为公式的值加单引号。需要保留原始文本时使用 JSONL。
+## File format
 
-## 用途与责任
+Use UTF-8. JSONL contains one object per line and CSV starts with a header row. Each record requires `source` and may include `id`, `context`, and `target`. These four fields are the public app's import and export format.
 
-本项目是独立的离线翻译语料编辑器，与 Board Game Arena 或其他翻译平台无隶属、授权或背书关系。仓库样例均为虚构。请仅导入、处理和分享你有权使用的数据，并遵守适用法律、平台条款及权利人的许可。
+CSV exports prefix formula-like values with a single quote for spreadsheet use. Use JSONL when the original text must be preserved exactly.
 
-本项目不提供平台登录、站点抓取或远程提交。请勿改造或使用本项目进行未经授权的访问、自动化采集、提交或再分发。平台授权由相应权利人授予。BGA 的操作应遵守其公开条款。[BGA 使用条款](https://fr.boardgamearena.com/legal?section=tos)
+## Responsible use and liability
 
-软件按现状提供。在适用法律允许的范围内，保证免责声明与责任限制适用 Apache-2.0 第 7、8 节。使用者自行判断软件和数据是否适合其用途。本说明不修改许可证，也不排除依法不得限制的责任。[使用声明](NOTICE.md) · [Apache-2.0 许可证](LICENSE)
+This is an independent offline editor. Board Game Arena and other translation platforms do not sponsor, endorse, or authorize it. The examples are fictional. Use and share only data you have permission to handle, and follow applicable law, platform terms, and the rights holder's license.
 
-## 测试
+Integration declarations grant no access to platform accounts, services, or data. Obtain explicit authorization from the platform before any automated access, collection, or submission. [BGA terms of use](https://fr.boardgamearena.com/legal?section=tos)
 
-安装 Node.js 20 或更新版本后，在项目根目录运行 `node --test`。网页本身无需 Node.js。
+The software is provided as is. The warranty disclaimer and limitation of liability in Apache-2.0 sections 7 and 8 apply to the extent permitted by applicable law. Users are responsible for deciding whether the software and their data are suitable for their purposes. [Responsible-use notice](NOTICE.md) · [Apache-2.0 license](LICENSE)
+
+## Tests
+
+Run `node --test` with Node.js 20 or later. With TypeScript installed, run `tsc --strict --noEmit tests/full-tool-contract.types.ts` to check the declaration contract. Neither tool is required to open the viewer.

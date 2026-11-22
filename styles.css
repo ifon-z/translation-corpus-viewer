@@ -1,0 +1,98 @@
+:root {
+  color-scheme: light;
+  font-family: system-ui, "Microsoft YaHei", sans-serif;
+  color: #172824;
+  background: #eef3ee;
+  --line: #d5dfd8;
+  --accent: #24584a;
+  --muted: #496059;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; }
+main { width: min(88rem, 100%); margin: auto; padding: clamp(1rem, 4vw, 3rem); }
+header { border-top: 4px solid var(--accent); padding-top: 1rem; }
+h1, h2 { margin: .25rem 0 .55rem; line-height: 1.2; }
+h1 { font-size: clamp(1.65rem, 4vw, 2.5rem); }
+h2 { font-size: 1.38rem; }
+header p, footer { color: var(--muted); line-height: 1.55; }
+footer { margin-top: 1.5rem; font-size: .88rem; }
+.workspace { background: white; border: 1px solid var(--line); border-radius: .65rem; }
+.toolbar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 1rem;
+  padding: 1rem;
+  align-items: end;
+}
+label { display: grid; gap: .35rem; font-size: .88rem; font-weight: 600; }
+button, input, select, textarea { font: inherit; color: inherit; }
+input, select, textarea {
+  width: 100%;
+  padding: .55rem .65rem;
+  border: 1px solid #a7b8af;
+  border-radius: .4rem;
+  background: white;
+}
+input[type="file"] { padding: .34rem .4rem; }
+input::file-selector-button, button {
+  border: 1px solid var(--accent);
+  border-radius: .4rem;
+  background: #eff7f1;
+  color: #194336;
+  padding: .45rem .65rem;
+  cursor: pointer;
+}
+input::file-selector-button { margin-right: .4rem; }
+button:hover:not(:disabled), input::file-selector-button:hover { background: #dbece1; }
+button:disabled { opacity: .55; cursor: default; }
+:focus-visible { outline: 3px solid #477cb4; outline-offset: 2px; }
+.downloads, .dialog-actions { display: flex; gap: .45rem; flex-wrap: wrap; }
+.summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 1rem;
+  color: var(--muted);
+  border-block: 1px solid var(--line);
+  background: #f6f9f6;
+  font-size: .89rem;
+}
+.summary p { margin: .6rem 0; overflow-wrap: anywhere; }
+#count { white-space: nowrap; }
+#empty { padding: 1rem; color: var(--muted); }
+.table-scroll { overflow: auto; }
+table { width: 100%; min-width: 44rem; border-collapse: collapse; text-align: left; }
+th, td { vertical-align: top; padding: .75rem 1rem; }
+th { background: #f6f9f6; font-size: .88rem; }
+td {
+  border-top: 1px solid var(--line);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
+}
+th:nth-child(2), th:nth-child(3) { width: 34%; }
+.metadata, .actions, .issue, .passed { font-size: .86rem; }
+.metadata { color: var(--muted); }
+.edited { background: #edf7f0; }
+.issue { color: #824512; }
+.passed { color: var(--accent); }
+.actions { white-space: nowrap; }
+dialog {
+  width: min(36rem, calc(100% - 2rem));
+  padding: 1.35rem;
+  color: inherit;
+  border: 1px solid var(--line);
+  border-radius: .6rem;
+}
+dialog::backdrop { background: #17282477; }
+#edit-source {
+  padding: .8rem;
+  background: #eef3ee;
+  border-radius: .35rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+textarea { display: block; margin-top: .35rem; resize: vertical; }
+.dialog-actions { justify-content: flex-end; margin-top: 1rem; }

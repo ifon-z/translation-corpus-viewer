@@ -1,0 +1,19 @@
+{
+  "name": "translation-corpus-viewer",
+  "private": true,
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "build": "node scripts/build.cjs",
+    "check:build": "node scripts/build.cjs --check",
+    "test": "node --test",
+    "test:browser": "node tests/viewer.browser.cjs"
+  },
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "playwright-core": "1.65.1"
+  }
+}

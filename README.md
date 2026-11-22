@@ -6,12 +6,12 @@ Browse, search, edit, and validate a local corpus with one source language and o
 
 ## Quick start
 
-1. Download and unzip this repository, then open `index.html` in your browser. Use **Interface language** to switch between English and Simplified Chinese.
+1. Save [index.html](index.html) from its raw view or download it in the repository ZIP. Double-click the file to open it in your browser. The **English** and **Simplified Chinese** buttons switch the interface.
 2. Select a local JSONL or CSV file, or load a fictional example from the sidebar. The example files are also available below.
-3. Set **Source language** if needed. Use **Target language** to select which translation to search, filter, validate, or edit. Use **Add target language** to add another. In a legacy file, **Name target language** labels the existing translations first.
+3. Click the displayed **Source language** to change it. Select a **Target language** tab to search, filter, validate, or edit that translation. The arrow keys move between tabs. Use **Add target language** to add another. In a legacy file, **Name target language** labels the existing translations first.
 4. Export the full corpus and all target languages as JSONL or CSV. Reopen the exported file to continue editing later.
 
-The browser needs no installation, login, or local server. Edits stay in the current page until you save an export. Search and filters affect the display only.
+The HTML file contains the React viewer, styles, and fictional examples. Move it anywhere and open it offline. Edits stay in the current page until you save an export. Search and filters affect the display only.
 
 ### Example 1 — A BGA-style board game
 
@@ -50,6 +50,16 @@ Integration declarations grant no access to platform accounts, services, or data
 
 The software is provided as is. The warranty disclaimer and limitation of liability in Apache-2.0 sections 7 and 8 apply to the extent permitted by applicable law. Users are responsible for deciding whether the software and their data are suitable for their purposes. [Apache-2.0 license](LICENSE)
 
-## Tests
+## Development
 
-Run `node --test` with Node.js 20 or later. With TypeScript installed, run `tsc --strict --noEmit tests/full-tool-contract.types.ts` to check the declaration contract. Neither tool is required to open the viewer.
+Use Node.js 24 and pnpm 11 to install development dependencies and build the standalone file.
+
+```sh
+pnpm install --frozen-lockfile
+pnpm build
+pnpm check:build
+pnpm test
+pnpm test:browser
+```
+
+The browser test uses an installed Edge browser by default. Set `BROWSER_PATH` to use another installed Chromium browser. With TypeScript installed, run `tsc --strict --noEmit tests/full-tool-contract.types.ts` to check the declaration contract.

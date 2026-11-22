@@ -166,13 +166,9 @@ test("the fictional field guide pairs Spanish with three independent translation
   assert.deepEqual(toRows(workspace), rows)
 })
 
-test("both interface languages cover the same messages and HTML bindings", () => {
+test("both interface languages cover the same messages and variables", () => {
   const { en, "zh-CN": zh } = require("../i18n.js")
   assert.deepEqual(Object.keys(en).sort(), Object.keys(zh).sort())
-  const html = readFileSync(join(__dirname, "..", "index.html"), "utf8")
-  for (const [, key] of html.matchAll(/\bdata-(?:t|label|placeholder)="([^"]+)"/g)) {
-    assert.ok(en[key] && zh[key], key)
-  }
   for (const key of Object.keys(en)) {
     const tokens = (text) => Array.from(text.matchAll(/\{\w+\}/g), (match) => match[0]).sort()
     assert.deepEqual(tokens(en[key]), tokens(zh[key]), key)

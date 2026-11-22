@@ -24,6 +24,7 @@ function visible(entry) {
 
 function cell(content, className) {
   const td = document.createElement("td")
+  td.setAttribute("role", "cell")
   td.textContent = content
   if (className) td.className = className
   return td
@@ -31,8 +32,12 @@ function cell(content, className) {
 
 function render() {
   const shown = entries.filter(visible)
+  $("total").textContent = entries.length
+  $("untranslated-count").textContent = entries.filter(({ row }) => !row.target.trim()).length
+  $("issue-count").textContent = entries.filter(({ issues }) => issues.length > 0).length
   $("count").textContent = "显示 " + shown.length + " / " + entries.length + " 条"
-  $("empty").textContent = "没有符合筛选条件的词条。"
+  $("empty-title").textContent = "没有符合条件的词条"
+  $("empty-help").textContent = "调整搜索内容或切换筛选条件。"
   $("empty").hidden = shown.length > 0
   $("table-scroll").hidden = shown.length === 0
 
@@ -40,10 +45,16 @@ function render() {
   for (const entry of shown) {
     const { row, originalTarget, issues } = entry
     const tr = document.createElement("tr")
+    tr.setAttribute("role", "row")
     const meta = [row.id, row.context].filter(Boolean).join("\n")
-    const note = issues.join("\n") || "通过"
+    const badge = document.createElement("span")
+    badge.className = issues.length ? "badge issue" : "badge passed"
+    badge.textContent = issues.join("\n") || "通过"
+    const validation = cell("")
+    validation.append(badge)
     const edit = document.createElement("button")
     edit.type = "button"
+    edit.className = "button row-button"
     edit.textContent = "编辑译文"
     edit.addEventListener("click", () => {
       current = entry
@@ -57,12 +68,25 @@ function render() {
       cell(meta || "—", "metadata"),
       cell(row.source),
       cell(row.target || "—", row.target !== originalTarget ? "edited" : ""),
-      cell(note, issues.length ? "issue" : "passed"),
+      validation,
       actions,
     )
     body.append(tr)
   }
   $("rows").replaceChildren(body)
+}
+
+function loadCorpus(text, name) {
+  const rows = Corpus.parse(text, name)
+  if (pendingExport && !window.confirm("当前编辑尚未导出。要打开新文件吗？")) return
+  entries = rows.map((row) => ({ row, originalTarget: row.target, issues: Corpus.issues(row) }))
+  pendingExport = false
+  filename = name.replace(/\.[^.]+$/, "")
+  status.textContent = "已导入 " + name
+  search.value = ""
+  filter.value = "all"
+  for (const control of [search, filter, $("jsonl"), $("csv")]) control.disabled = false
+  render()
 }
 
 fileInput.addEventListener("change", async () => {
@@ -71,16 +95,7 @@ fileInput.addEventListener("change", async () => {
   fileInput.disabled = true
   try {
     if (!/\.(jsonl|csv)$/i.test(file.name)) throw new Error("请选择 JSONL 或 CSV 文件")
-    const rows = Corpus.parse(await file.text(), file.name)
-    if (pendingExport && !window.confirm("当前编辑尚未导出。要打开新文件吗？")) return
-    entries = rows.map((row) => ({ row, originalTarget: row.target, issues: Corpus.issues(row) }))
-    pendingExport = false
-    filename = file.name.replace(/\.[^.]+$/, "")
-    status.textContent = "已导入 " + file.name
-    search.value = ""
-    filter.value = "all"
-    for (const control of [search, filter, $("jsonl"), $("csv")]) control.disabled = false
-    render()
+    loadCorpus(await file.text(), file.name)
   } catch (error) {
     status.textContent = "导入失败。 " + error.message
   } finally {
@@ -88,6 +103,13 @@ fileInput.addEventListener("change", async () => {
     fileInput.disabled = false
   }
 })
+
+for (const button of document.querySelectorAll("[data-example]")) {
+  button.addEventListener("click", () => {
+    const name = button.dataset.example
+    loadCorpus(ViewerExamples[name], name)
+  })
+}
 
 search.addEventListener("input", render)
 filter.addEventListener("change", render)

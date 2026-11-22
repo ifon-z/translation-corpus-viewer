@@ -1,0 +1,6 @@
+{"id":"orchard-demo-01","context":"Setup","source":"Place {gearCount} seed gears beside the orchard dial.","target":"把 {gearCount} 枚种子齿轮放在果园转盘旁。"}
+{"id":"orchard-demo-02","context":"Turn prompt","source":"Pass the orchard key to the next keeper.","target":""}
+{"id":"orchard-demo-03","context":"End of round","source":"Ring the orchard bell at {bellTime}.","target":"敲响果园铃。"}
+{"id":"orchard-demo-04","context":"Rules reminder","source":"Rotate the [green]seed bridge[/green] before opening the gate.","target":"打开大门前，转动种子桥。"}
+{"id":"orchard-demo-05","context":"Score summary","source":"%1$s collected %2$d gear blossoms.","target":"%1$s 收集了 %2$d 朵齿轮花。"}
+{"id":"orchard-demo-06","context":"Tutorial","source":"A seed gear can be used once per round.","target":"每枚种子齿轮每轮可使用一次。"}

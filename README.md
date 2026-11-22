@@ -7,11 +7,21 @@ Browse, search, edit, and validate bilingual entries in local JSONL and CSV file
 ## Quick start
 
 1. Download and unzip this repository, then open `index.html` in your browser.
-2. Import the fictional [JSONL](examples/fictional.jsonl) or [CSV](examples/fictional.csv) example, or select a local file.
+2. Select a local JSONL or CSV file, or load a fictional example from the sidebar. The example files are also available below.
 3. Search or filter entries, edit translations, and review alerts about empty translations, placeholders, and markup.
 4. Export the full corpus as JSONL or CSV. Reopen the exported file to continue editing later.
 
 The browser needs no installation, login, or local server. Edits stay in the current page until you save an export. Search and filters affect the display only.
+
+### Example 1 — A BGA-style board game
+
+Load **BGA-style board game (BGA 风格桌游)** or import the [board-game JSONL](examples/bga-style-demo.jsonl). It contains six invented English–Chinese entries. Select **Validation alerts (校验有提示)** to find a blank translation, a missing placeholder, and missing markup. Edit `orchard-demo-03` so the translation keeps `{bellTime}`, then export JSONL to save the draft.
+
+**Disclaimer.** The game's text, translations, and IDs are fictional. This example uses no BGA data and makes no connection to BGA. The project is independent and has no BGA affiliation or endorsement. Any BGA platform access must follow its terms. [BGA terms of use](https://fr.boardgamearena.com/legal?section=tos) · [Responsible-use notice](NOTICE.md)
+
+### Example 2 — Localizing a writing app
+
+Load **Application UI copy (应用界面文案)** or import the [application UI CSV](examples/app-ui-demo.csv). Review navigation labels, status messages, and a multiline export instruction in a fictional writing app. Use **Untranslated (未翻译)** to find `ui-demo-04` and fill in its translation. Export CSV to hand the copy back to a teammate.
 
 ## Public and full editions
 

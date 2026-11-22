@@ -7,67 +7,117 @@
   <title>翻译语料查看器</title>
   <link rel="stylesheet" href="styles.css">
   <script defer src="corpus.js"></script>
+  <script defer src="examples/bundled.js"></script>
   <script defer src="viewer.js"></script>
 </head>
 <body>
-  <main>
-    <header>
-      <h1>翻译语料查看器</h1>
-      <p>导入本地 JSONL 或 CSV。编辑暂存在当前页面，导出后即可保存。</p>
-    </header>
-    <section class="workspace" aria-label="语料工作区">
-      <div class="toolbar">
-        <label>导入 JSONL 或 CSV
-          <input id="import" type="file" accept=".jsonl,.csv">
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="语料来源">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">译</span>
+        <span>语料查看器</span>
+      </div>
+      <section class="sidebar-section" aria-labelledby="import-heading">
+        <h2 id="import-heading">语料文件</h2>
+        <label class="file-picker">
+          <span class="file-picker-icon" aria-hidden="true"></span>
+          <span>
+            <strong>导入本地文件</strong>
+            <small>JSONL / CSV · UTF-8</small>
+          </span>
+          <input id="import" type="file" accept=".jsonl,.csv" aria-label="导入 JSONL 或 CSV">
         </label>
-        <label>搜索
-          <input id="search" type="search" placeholder="原文、译文、上下文或 ID" autocomplete="off" spellcheck="false" disabled>
-        </label>
-        <label>筛选
-          <select id="filter" disabled>
-            <option value="all">全部词条</option>
-            <option value="issues">校验有提示</option>
-            <option value="untranslated">未翻译</option>
-            <option value="edited">已编辑</option>
-          </select>
-        </label>
-        <div class="downloads">
-          <button id="jsonl" type="button" disabled>导出 JSONL</button>
-          <button id="csv" type="button" disabled>导出 CSV</button>
+      </section>
+      <section class="sidebar-section" aria-labelledby="examples-heading">
+        <h2 id="examples-heading">载入虚构样例</h2>
+        <div class="examples">
+          <button class="example-button" type="button" data-example="bga-style-demo.jsonl">
+            <span>
+              <strong>BGA 风格桌游</strong>
+              <small>规则与回合提示</small>
+            </span>
+            <span class="file-type">JSONL</span>
+          </button>
+          <button class="example-button" type="button" data-example="app-ui-demo.csv">
+            <span>
+              <strong>应用界面文案</strong>
+              <small>导航、保存与导出</small>
+            </span>
+            <span class="file-type">CSV</span>
+          </button>
         </div>
-      </div>
-      <div class="summary">
-        <p id="status" role="status">选择要编辑的文件。</p>
-        <p id="count" aria-live="polite"></p>
-      </div>
-      <p id="empty">可以先导入 examples 目录中的虚构样例。</p>
-      <div class="table-scroll" id="table-scroll" hidden>
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">ID / 上下文</th>
-              <th scope="col">原文</th>
-              <th scope="col">译文</th>
-              <th scope="col">校验</th>
-              <th scope="col">操作</th>
-            </tr>
-          </thead>
-          <tbody id="rows"></tbody>
-        </table>
-      </div>
-    </section>
-    <footer>仅处理你有权使用的数据。本工具在本机运行，与任何翻译平台无隶属关系。按现状提供，责任限制见随附许可证。</footer>
-    <noscript>请启用 JavaScript 以在浏览器中处理本地文件。</noscript>
-  </main>
+        <p class="sidebar-note">桌游样例为虚构。本项目与 BGA 无隶属关系。</p>
+      </section>
+      <p class="local-status">在本机离线运行</p>
+    </aside>
+    <main class="main-panel">
+      <header class="page-header">
+        <div>
+          <h1>翻译工作台</h1>
+          <p>导入语料，检查并编辑译文。导出后保留修改。</p>
+        </div>
+        <div class="downloads">
+          <button id="csv" type="button" class="button" disabled>导出 CSV</button>
+          <button id="jsonl" type="button" class="button primary" disabled>导出 JSONL</button>
+        </div>
+      </header>
+      <dl class="metrics" aria-label="语料统计">
+        <div class="metric"><dt>总词条</dt><dd id="total">0</dd></div>
+        <div class="metric"><dt>未翻译</dt><dd id="untranslated-count">0</dd></div>
+        <div class="metric"><dt>校验有提示</dt><dd id="issue-count">0</dd></div>
+      </dl>
+      <section class="workspace" aria-label="词条">
+        <div class="toolbar">
+          <label>搜索
+            <input id="search" type="search" placeholder="原文、译文、上下文或 ID" autocomplete="off" spellcheck="false" disabled>
+          </label>
+          <label>筛选
+            <select id="filter" disabled>
+              <option value="all">全部词条</option>
+              <option value="issues">校验有提示</option>
+              <option value="untranslated">未翻译</option>
+              <option value="edited">已编辑</option>
+            </select>
+          </label>
+        </div>
+        <div class="summary">
+          <p id="status" role="status">等待导入文件</p>
+          <p id="count" aria-live="polite"></p>
+        </div>
+        <div class="empty-state" id="empty">
+          <span class="empty-icon" aria-hidden="true"></span>
+          <h2 id="empty-title">导入语料开始编辑</h2>
+          <p id="empty-help">选择本地文件，或从侧栏载入一份虚构样例。</p>
+        </div>
+        <div class="table-scroll" id="table-scroll" tabindex="0" role="region" aria-label="词条表格" hidden>
+          <table role="table" aria-label="翻译词条">
+            <thead role="rowgroup">
+              <tr role="row">
+                <th scope="col" role="columnheader">ID / 上下文</th>
+                <th scope="col" role="columnheader">原文</th>
+                <th scope="col" role="columnheader">译文</th>
+                <th scope="col" role="columnheader">校验</th>
+                <th scope="col" role="columnheader">操作</th>
+              </tr>
+            </thead>
+            <tbody id="rows" role="rowgroup"></tbody>
+          </table>
+        </div>
+      </section>
+      <footer>仅处理你有权使用的数据。软件按现状提供，责任限制见随附许可证。</footer>
+      <noscript>请启用 JavaScript 以在浏览器中处理本地文件。</noscript>
+    </main>
+  </div>
   <dialog id="editor" aria-labelledby="edit-title">
     <form id="edit-form">
       <h2 id="edit-title">编辑译文</h2>
+      <p class="field-title">原文</p>
       <p id="edit-source"></p>
       <label for="edit-target">译文</label>
       <textarea id="edit-target" rows="5" autocomplete="off" spellcheck="false" autofocus></textarea>
       <div class="dialog-actions">
-        <button id="cancel" type="button">取消</button>
-        <button type="submit">保存译文</button>
+        <button id="cancel" type="button" class="button">取消</button>
+        <button type="submit" class="button primary">保存译文</button>
       </div>
     </form>
   </dialog>

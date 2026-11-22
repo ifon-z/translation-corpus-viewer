@@ -1,0 +1,8 @@
+id,context,source,target
+ui-demo-01,Navigation,Open a saved draft,打开已保存的草稿
+ui-demo-02,Storage,This workspace uses {used} of {limit} draft slots.,此工作区已使用 {used} / {limit} 个草稿位置。
+ui-demo-03,Export help,"Choose ""Export"", then select a format.
+Keep the original for your records.","选择“导出”，然后选择格式。
+请保留原始文件备查。"
+ui-demo-04,Empty state,Start a draft from a blank page.,
+ui-demo-05,Confirmation,Your draft has been saved.,草稿已保存。

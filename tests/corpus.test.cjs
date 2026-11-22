@@ -83,3 +83,31 @@ test("imports both bundled fictional examples", () => {
     assert.equal(rows[0].id, "demo-01")
   }
 })
+
+test("the fictional BGA-style example exercises three translation checks", () => {
+  const name = "bga-style-demo.jsonl"
+  const rows = parse(readFileSync(join(__dirname, "..", "examples", name), "utf8"), name)
+  assert.equal(rows.length, 6)
+  assert.deepEqual(rows.filter((row) => issues(row).length).map((row) => [row.id, issues(row)]), [
+    ["orchard-demo-02", ["译文为空"]],
+    ["orchard-demo-03", ["占位符不一致"]],
+    ["orchard-demo-04", ["标记不一致"]],
+  ])
+})
+
+test("the fictional app example handles a quoted multiline UI string", () => {
+  const name = "app-ui-demo.csv"
+  const rows = parse(readFileSync(join(__dirname, "..", "examples", name), "utf8"), name)
+  assert.equal(rows.length, 5)
+  assert.equal(rows.find((row) => row.id === "ui-demo-03").source,
+    'Choose "Export", then select a format.\nKeep the original for your records.')
+  assert.deepEqual(rows.filter((row) => issues(row).length).map((row) => row.id), ["ui-demo-04"])
+})
+
+test("the click-to-load examples match the separately downloadable files", () => {
+  const examples = require("../examples/bundled.js")
+  for (const name of ["bga-style-demo.jsonl", "app-ui-demo.csv"]) {
+    const asset = readFileSync(join(__dirname, "..", "examples", name), "utf8")
+    assert.equal(examples[name], asset.replace(/\r\n/g, "\n"))
+  }
+})

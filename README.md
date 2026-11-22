@@ -1,5 +1,7 @@
 # Translation Corpus Viewer
 
+English · [简体中文](README.zh-CN.md)
+
 Browse, search, edit, and validate bilingual entries in local JSONL and CSV files. The public edition runs entirely in your browser. It also includes [interface declarations](contracts/full-tool.d.ts) for the full edition's catalog, crawler tasks, corpus API, and submission workflow.
 
 ## Quick start

@@ -1,5 +1,7 @@
 # Full edition comparison and interface reference
 
+English · [简体中文](full-tool.zh-CN.md)
+
 The **public edition** runs as a static page over a user-selected JSONL or CSV file. The **full edition** adds a Python CLI and a local web server over a corpus store. [TypeScript declarations](../contracts/full-tool.d.ts) retain the full edition's local HTTP interface and CLI submission modes. They are compile-time definitions only. Opening the public app starts no server and performs no platform requests.
 
 ## Feature comparison

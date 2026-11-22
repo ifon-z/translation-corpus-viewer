@@ -1,27 +1,29 @@
 # Translation Corpus Viewer
 
-English · [简体中文](README.zh-CN.md)
+English · [Simplified Chinese](README.zh-CN.md)
 
-Browse, search, edit, and validate bilingual entries in local JSONL and CSV files. The public edition runs entirely in your browser. It also includes [interface declarations](contracts/full-tool.d.ts) for the full edition's catalog, crawler tasks, corpus API, and submission workflow.
+Browse, search, edit, and validate a local corpus with one source language and one or more target languages. The public edition runs entirely in your browser and includes [interface declarations](contracts/full-tool.d.ts) for the full edition's catalog, crawler tasks, corpus API, and submission workflow.
 
 ## Quick start
 
-1. Download and unzip this repository, then open `index.html` in your browser.
+1. Download and unzip this repository, then open `index.html` in your browser. Use **Interface language** to switch between English and Simplified Chinese.
 2. Select a local JSONL or CSV file, or load a fictional example from the sidebar. The example files are also available below.
-3. Search or filter entries, edit translations, and review alerts about empty translations, placeholders, and markup.
-4. Export the full corpus as JSONL or CSV. Reopen the exported file to continue editing later.
+3. Set **Source language** if needed. Use **Target language** to select which translation to search, filter, validate, or edit. Use **Add target language** to add another. In a legacy file, **Name target language** labels the existing translations first.
+4. Export the full corpus and all target languages as JSONL or CSV. Reopen the exported file to continue editing later.
 
 The browser needs no installation, login, or local server. Edits stay in the current page until you save an export. Search and filters affect the display only.
 
 ### Example 1 — A BGA-style board game
 
-Load **BGA-style board game (BGA 风格桌游)** or import the [board-game JSONL](examples/bga-style-demo.jsonl). It contains six invented English–Chinese entries. Select **Validation alerts (校验有提示)** to find a blank translation, a missing placeholder, and missing markup. Edit `orchard-demo-03` so the translation keeps `{bellTime}`, then export JSONL to save the draft.
-
-**Disclaimer.** The game's text, translations, and IDs are fictional. This example uses no BGA data and makes no connection to BGA. The project is independent and has no BGA affiliation or endorsement. Any BGA platform access must follow its terms. [BGA terms of use](https://fr.boardgamearena.com/legal?section=tos) · [Responsible-use notice](NOTICE.md)
+Load **BGA-style board game** or import the [board-game JSONL](examples/bga-style-demo.jsonl). It contains six invented English–Chinese entries. Select **Validation alerts** to find a blank translation, a missing placeholder, and missing markup. Edit `orchard-demo-03` so the translation keeps `{bellTime}`, then export JSONL to save the draft.
 
 ### Example 2 — Localizing a writing app
 
-Load **Application UI copy (应用界面文案)** or import the [application UI CSV](examples/app-ui-demo.csv). Review navigation labels, status messages, and a multiline export instruction in a fictional writing app. Use **Untranslated (未翻译)** to find `ui-demo-04` and fill in its translation. Export CSV to hand the copy back to a teammate.
+Load **Application UI copy** or import the [application UI CSV](examples/app-ui-demo.csv). Review navigation labels, status messages, and a multiline export instruction in a fictional writing app. Use **Untranslated** to find `ui-demo-04` and fill in its translation. Export CSV to hand the copy back to a teammate.
+
+### Example 3 — A multilingual field guide
+
+Load **Multilingual field guide** or import its [fictional JSONL](examples/multilingual-demo.jsonl). The Spanish source has English, Simplified Chinese, and Arabic targets. Switch to Arabic and select **Untranslated** to find `guide-demo-02`. Switch back to English to see that the same entry already has a translation. Export either format to keep all three targets.
 
 ## Public and full editions
 
@@ -29,17 +31,24 @@ The public app provides the local file workflow. The full edition adds a module 
 
 ## File format
 
-Use UTF-8. JSONL contains one object per line and CSV starts with a header row. Each record requires `source` and may include `id`, `context`, and `target`. These four fields are the public app's import and export format.
+Use UTF-8. JSONL contains one object per line and CSV starts with a header row. Each entry requires `source` and may include `id` and `context`. A corpus can supply one `source_locale` across its entries, for example `es`. Entries without it inherit the source locale when one is supplied elsewhere in the file.
+
+| Format | Existing single target | Named targets |
+| --- | --- | --- |
+| JSONL | The `target` text field | A `translations` object keyed by language tag, for example `{"zh-CN":"...", "fr-FR":"..."}` |
+| CSV | The `target` column | One column per language, for example `target:zh-CN,target:fr-FR` |
+
+Use a language tag recognized by your browser, such as `en`, `zh-CN`, or `fr-FR`. Blank cells or missing translations are editable and shown as untranslated. Keep named and unnamed target text in separate files. The viewer preserves the single-target format until that target is named.
 
 CSV exports prefix formula-like values with a single quote for spreadsheet use. Use JSONL when the original text must be preserved exactly.
 
 ## Responsible use and liability
 
-This is an independent offline editor. Board Game Arena and other translation platforms do not sponsor, endorse, or authorize it. The examples are fictional. Use and share only data you have permission to handle, and follow applicable law, platform terms, and the rights holder's license.
+This is an independent offline editor with no affiliation, endorsement, or authorization from Board Game Arena or other translation platforms. All bundled game text, translations, and identifiers are fictional. The BGA-style example uses no BGA data and makes no connection to BGA. Use and share only data you have permission to handle, and follow applicable law, platform terms, and the rights holder's license.
 
 Integration declarations grant no access to platform accounts, services, or data. Obtain explicit authorization from the platform before any automated access, collection, or submission. [BGA terms of use](https://fr.boardgamearena.com/legal?section=tos)
 
-The software is provided as is. The warranty disclaimer and limitation of liability in Apache-2.0 sections 7 and 8 apply to the extent permitted by applicable law. Users are responsible for deciding whether the software and their data are suitable for their purposes. [Responsible-use notice](NOTICE.md) · [Apache-2.0 license](LICENSE)
+The software is provided as is. The warranty disclaimer and limitation of liability in Apache-2.0 sections 7 and 8 apply to the extent permitted by applicable law. Users are responsible for deciding whether the software and their data are suitable for their purposes. [Apache-2.0 license](LICENSE)
 
 ## Tests
 

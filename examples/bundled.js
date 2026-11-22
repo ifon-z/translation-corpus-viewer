@@ -20,6 +20,12 @@ const ViewerExamples = {
     "ui-demo-05,Confirmation,Your draft has been saved.,草稿已保存。",
     "",
   ].join("\n"),
+  "multilingual-demo.jsonl": [
+    "{\"id\":\"guide-demo-01\",\"context\":\"Trail notes\",\"source_locale\":\"es\",\"source\":\"Anota {count} destellos antes de bajar la colina.\",\"translations\":{\"en\":\"Record {count} flashes before heading down the hill.\",\"zh-CN\":\"下山前记下 {count} 次闪光。\",\"ar\":\"سجّل {count} ومضات قبل النزول من التل.\"}}",
+    "{\"id\":\"guide-demo-02\",\"context\":\"Navigation\",\"source_locale\":\"es\",\"source\":\"Busca la puerta de niebla.\",\"translations\":{\"en\":\"Look for the mist gate.\",\"zh-CN\":\"寻找迷雾之门。\",\"ar\":\"\"}}",
+    "{\"id\":\"guide-demo-03\",\"context\":\"Field equipment\",\"source_locale\":\"es\",\"source\":\"Guarda la brújula en el estuche de lona.\",\"translations\":{\"en\":\"Store the compass in the canvas case.\",\"zh-CN\":\"把指南针放回帆布盒。\",\"ar\":\"ضع البوصلة في الحافظة القماشية.\"}}",
+    "",
+  ].join("\n"),
 }
 
 if (typeof module === "object") module.exports = ViewerExamples

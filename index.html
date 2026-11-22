@@ -1,123 +1,167 @@
 <!doctype html>
-<html lang="zh-CN" translate="no">
+<html lang="en" translate="no">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'">
-  <title>翻译语料查看器</title>
+  <title data-t="brand">Corpus Viewer</title>
   <link rel="stylesheet" href="styles.css">
   <script defer src="corpus.js"></script>
   <script defer src="examples/bundled.js"></script>
+  <script defer src="i18n.js"></script>
   <script defer src="viewer.js"></script>
 </head>
 <body>
   <div class="app-shell">
-    <aside class="sidebar" aria-label="语料来源">
+    <aside class="sidebar" aria-label="Corpus sources" data-label="sources">
       <div class="brand">
-        <span class="brand-mark" aria-hidden="true">译</span>
-        <span>语料查看器</span>
+        <span class="brand-mark" aria-hidden="true">Aa</span>
+        <span data-t="brand">Corpus Viewer</span>
       </div>
       <section class="sidebar-section" aria-labelledby="import-heading">
-        <h2 id="import-heading">语料文件</h2>
+        <h2 id="import-heading" data-t="corpusFile">Corpus file</h2>
         <label class="file-picker">
           <span class="file-picker-icon" aria-hidden="true"></span>
           <span>
-            <strong>导入本地文件</strong>
+            <strong data-t="importFile">Import local file</strong>
             <small>JSONL / CSV · UTF-8</small>
           </span>
-          <input id="import" type="file" accept=".jsonl,.csv" aria-label="导入 JSONL 或 CSV">
+          <input id="import" type="file" accept=".jsonl,.csv" aria-label="Import JSONL or CSV" data-label="importLabel">
         </label>
       </section>
       <section class="sidebar-section" aria-labelledby="examples-heading">
-        <h2 id="examples-heading">载入虚构样例</h2>
+        <h2 id="examples-heading" data-t="examples">Load fictional examples</h2>
         <div class="examples">
           <button class="example-button" type="button" data-example="bga-style-demo.jsonl">
             <span>
-              <strong>BGA 风格桌游</strong>
-              <small>规则与回合提示</small>
+              <strong data-t="boardGame">BGA-style board game</strong>
+              <small data-t="boardGameHelp">Rules and turn prompts</small>
             </span>
             <span class="file-type">JSONL</span>
           </button>
           <button class="example-button" type="button" data-example="app-ui-demo.csv">
             <span>
-              <strong>应用界面文案</strong>
-              <small>导航、保存与导出</small>
+              <strong data-t="appCopy">Application UI copy</strong>
+              <small data-t="appHelp">Navigation, save, and export</small>
             </span>
             <span class="file-type">CSV</span>
           </button>
+          <button class="example-button" type="button" data-example="multilingual-demo.jsonl">
+            <span>
+              <strong data-t="multilingual">Multilingual field guide</strong>
+              <small data-t="multilingualHelp">One source, three translations</small>
+            </span>
+            <span class="file-type">JSONL</span>
+          </button>
         </div>
-        <p class="sidebar-note">桌游样例为虚构。本项目与 BGA 无隶属关系。</p>
       </section>
-      <p class="local-status">在本机离线运行</p>
+      <p class="local-status" data-t="offline">Runs locally, offline</p>
     </aside>
     <main class="main-panel">
       <header class="page-header">
         <div>
-          <h1>翻译工作台</h1>
-          <p>导入语料，检查并编辑译文。导出后保留修改。</p>
+          <h1 data-t="title">Translation Workspace</h1>
+          <p data-t="intro">Import a corpus, check and edit translations, then export your changes.</p>
         </div>
-        <div class="downloads">
-          <button id="csv" type="button" class="button" disabled>导出 CSV</button>
-          <button id="jsonl" type="button" class="button primary" disabled>导出 JSONL</button>
+        <div class="header-tools">
+          <label class="ui-language">
+            <span data-t="uiLanguage">Interface language</span>
+            <select id="ui-language">
+              <option value="en" lang="en">English</option>
+              <option value="zh-CN" lang="zh-CN">简体中文</option>
+            </select>
+          </label>
+          <div class="downloads">
+            <button id="csv" type="button" class="button" data-t="exportCsv" disabled>Export CSV</button>
+            <button id="jsonl" type="button" class="button primary" data-t="exportJsonl" disabled>Export JSONL</button>
+          </div>
         </div>
       </header>
-      <dl class="metrics" aria-label="语料统计">
-        <div class="metric"><dt>总词条</dt><dd id="total">0</dd></div>
-        <div class="metric"><dt>未翻译</dt><dd id="untranslated-count">0</dd></div>
-        <div class="metric"><dt>校验有提示</dt><dd id="issue-count">0</dd></div>
+      <dl class="metrics" aria-label="Corpus statistics" data-label="stats">
+        <div class="metric"><dt data-t="total">Total entries</dt><dd id="total">0</dd></div>
+        <div class="metric"><dt data-t="untranslated">Untranslated</dt><dd id="untranslated-count">0</dd></div>
+        <div class="metric"><dt data-t="issues">Validation alerts</dt><dd id="issue-count">0</dd></div>
       </dl>
-      <section class="workspace" aria-label="词条">
-        <div class="toolbar">
-          <label>搜索
-            <input id="search" type="search" placeholder="原文、译文、上下文或 ID" autocomplete="off" spellcheck="false" disabled>
+      <section class="workspace" aria-label="Translation entries" data-label="rows">
+        <div class="language-controls" role="group" aria-label="Corpus languages" data-label="languages">
+          <label>
+            <span data-t="sourceLanguage">Source language</span>
+            <input id="source-locale" type="text" placeholder="Unspecified" data-placeholder="unnamed" autocomplete="off" spellcheck="false" disabled>
           </label>
-          <label>筛选
+          <label>
+            <span data-t="targetLanguage">Target language</span>
+            <select id="target-locale" disabled></select>
+          </label>
+          <button id="new-locale" type="button" class="button" disabled>Add target language</button>
+        </div>
+        <div class="toolbar">
+          <label>
+            <span data-t="search">Search</span>
+            <input id="search" type="search" placeholder="Source, current translation, context, or ID" data-placeholder="searchHint" autocomplete="off" spellcheck="false" disabled>
+          </label>
+          <label>
+            <span data-t="filter">Filter</span>
             <select id="filter" disabled>
-              <option value="all">全部词条</option>
-              <option value="issues">校验有提示</option>
-              <option value="untranslated">未翻译</option>
-              <option value="edited">已编辑</option>
+              <option value="all" data-t="all">All entries</option>
+              <option value="issues" data-t="issues">Validation alerts</option>
+              <option value="untranslated" data-t="untranslated">Untranslated</option>
+              <option value="edited" data-t="edited">Edited</option>
             </select>
           </label>
         </div>
         <div class="summary">
-          <p id="status" role="status">等待导入文件</p>
+          <p id="status" role="status">Waiting for a corpus</p>
           <p id="count" aria-live="polite"></p>
         </div>
         <div class="empty-state" id="empty">
           <span class="empty-icon" aria-hidden="true"></span>
-          <h2 id="empty-title">导入语料开始编辑</h2>
-          <p id="empty-help">选择本地文件，或从侧栏载入一份虚构样例。</p>
+          <h2 id="empty-title">Import a corpus to start editing</h2>
+          <p id="empty-help">Choose a local file or load a fictional example from the sidebar.</p>
         </div>
-        <div class="table-scroll" id="table-scroll" tabindex="0" role="region" aria-label="词条表格" hidden>
-          <table role="table" aria-label="翻译词条">
+        <div class="table-scroll" id="table-scroll" tabindex="0" role="region" aria-label="Corpus table" data-label="table" hidden>
+          <table role="table" aria-label="Translation entries" data-label="rows">
             <thead role="rowgroup">
               <tr role="row">
-                <th scope="col" role="columnheader">ID / 上下文</th>
-                <th scope="col" role="columnheader">原文</th>
-                <th scope="col" role="columnheader">译文</th>
-                <th scope="col" role="columnheader">校验</th>
-                <th scope="col" role="columnheader">操作</th>
+                <th scope="col" role="columnheader" data-t="context">ID / Context</th>
+                <th scope="col" role="columnheader" data-t="source">Source</th>
+                <th scope="col" role="columnheader" data-t="target">Translation</th>
+                <th scope="col" role="columnheader" data-t="validation">Validation</th>
+                <th scope="col" role="columnheader" data-t="actions">Actions</th>
               </tr>
             </thead>
             <tbody id="rows" role="rowgroup"></tbody>
           </table>
         </div>
       </section>
-      <footer>仅处理你有权使用的数据。软件按现状提供，责任限制见随附许可证。</footer>
-      <noscript>请启用 JavaScript 以在浏览器中处理本地文件。</noscript>
+      <noscript>
+        <p>Enable JavaScript to work with local files in your browser.</p>
+        <p lang="zh-CN">请启用 JavaScript 以在浏览器中处理本地文件。</p>
+      </noscript>
     </main>
   </div>
   <dialog id="editor" aria-labelledby="edit-title">
     <form id="edit-form">
-      <h2 id="edit-title">编辑译文</h2>
-      <p class="field-title">原文</p>
+      <h2 id="edit-title">Edit translation</h2>
+      <p class="field-title" data-t="source">Source</p>
       <p id="edit-source"></p>
-      <label for="edit-target">译文</label>
+      <label for="edit-target" data-t="target">Translation</label>
       <textarea id="edit-target" rows="5" autocomplete="off" spellcheck="false" autofocus></textarea>
       <div class="dialog-actions">
-        <button id="cancel" type="button" class="button">取消</button>
-        <button type="submit" class="button primary">保存译文</button>
+        <button id="cancel" type="button" class="button" data-t="cancel">Cancel</button>
+        <button type="submit" class="button primary" data-t="save">Save translation</button>
+      </div>
+    </form>
+  </dialog>
+  <dialog id="locale-dialog" aria-labelledby="locale-title">
+    <form id="locale-form" novalidate>
+      <h2 id="locale-title">Add target language</h2>
+      <label for="locale-tag" data-t="tagLabel">Language tag</label>
+      <input id="locale-tag" type="text" autocomplete="off" spellcheck="false" aria-describedby="locale-help locale-error" required autofocus>
+      <p id="locale-help" class="field-help" data-t="tagHelp">Use a language tag such as en, zh-CN, or fr-FR.</p>
+      <p id="locale-error" class="field-error" role="alert" hidden></p>
+      <div class="dialog-actions">
+        <button id="locale-cancel" type="button" class="button" data-t="cancel">Cancel</button>
+        <button type="submit" class="button primary" data-t="saveLanguage">Save language</button>
       </div>
     </form>
   </dialog>

@@ -136,8 +136,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   font-weight: 750;
   white-space: nowrap;
 }
-.sidebar-note, .local-status { color: var(--nav-muted); font-size: .76rem; line-height: 1.55; }
-.sidebar-note { margin-top: .75rem; }
+.local-status { color: var(--nav-muted); font-size: .76rem; line-height: 1.55; }
 .local-status { margin-top: auto; }
 .local-status::before {
   display: inline-block;
@@ -165,6 +164,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .page-header h1 { font-size: clamp(1.65rem, 3vw, 2.35rem); line-height: 1.18; }
 .page-header p { margin-top: .4rem; color: var(--muted); line-height: 1.55; }
+.header-tools { display: flex; align-items: end; flex-wrap: wrap; gap: .85rem; }
 .downloads, .dialog-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
 .button {
   min-height: 2.5rem;
@@ -204,20 +204,26 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 #untranslated-count { color: #425977; }
 #issue-count { color: #8f4615; }
-.toolbar {
+.toolbar, .language-controls {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(9rem, 1fr);
   gap: .9rem;
   padding: 1rem;
 }
-.toolbar label, .field-title, #edit-form label {
+.toolbar { grid-template-columns: minmax(0, 2fr) minmax(9rem, 1fr); }
+.language-controls {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) auto;
+  align-items: end;
+  border-bottom: 1px solid var(--line);
+}
+.toolbar label, .language-controls label, .ui-language, .field-title, dialog label {
   display: grid;
   gap: .4rem;
+  min-width: 0;
   color: #344862;
   font-size: .84rem;
   font-weight: 650;
 }
-#search, #filter, #edit-target {
+#search, #filter, #edit-target, #source-locale, #target-locale, #ui-language, #locale-tag {
   width: 100%;
   min-height: 2.5rem;
   padding: .5rem .7rem;
@@ -225,7 +231,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   border-radius: .45rem;
   background: var(--surface);
 }
-#search:disabled, #filter:disabled { background: #f7f9fc; }
+#search:disabled, #filter:disabled, #source-locale:disabled, #target-locale:disabled { background: #f7f9fc; }
 .summary {
   display: flex;
   justify-content: space-between;
@@ -269,7 +275,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   content: "";
 }
 .empty-state h2 { font-size: 1.05rem; }
-.empty-state p, footer { color: var(--muted); font-size: .85rem; line-height: 1.55; }
+.empty-state p { color: var(--muted); font-size: .85rem; line-height: 1.55; }
 
 .table-scroll {
   max-height: min(66vh, 48rem);
@@ -294,6 +300,7 @@ td {
   overflow-wrap: anywhere;
   line-height: 1.55;
 }
+td[dir="auto"] { text-align: start; }
 tbody tr:last-child td { border-bottom: 0; }
 tbody tr:hover { background: #f8fafc; }
 th:nth-child(2), th:nth-child(3) { width: 32%; }
@@ -311,7 +318,6 @@ th:nth-child(2), th:nth-child(3) { width: 32%; }
 }
 .badge.issue { background: #fff0de; color: #75370d; }
 .badge.passed { background: #e4f5ec; color: #215f4c; }
-footer { margin-top: 1rem; }
 
 dialog {
   width: min(39rem, calc(100% - 2rem));
@@ -332,6 +338,9 @@ dialog h2 { margin-bottom: 1rem; font-size: 1.35rem; }
   overflow-wrap: anywhere;
 }
 #edit-target { display: block; margin-top: .4rem; resize: vertical; }
+#locale-tag { margin-top: .4rem; }
+.field-help, .field-error { margin-top: .5rem; color: var(--muted); font-size: .86rem; }
+.field-error { color: #9d291e; }
 .dialog-actions { justify-content: flex-end; margin-top: 1rem; }
 
 @media (max-width: 780px) {
@@ -379,8 +388,7 @@ dialog h2 { margin-bottom: 1rem; font-size: 1.35rem; }
     font-size: .78rem;
     font-weight: 650;
   }
-  td:nth-child(2)::before { content: "原文"; }
-  td:nth-child(3)::before { content: "译文"; }
+  td:nth-child(2)::before, td:nth-child(3)::before { content: attr(data-heading); }
   .actions { justify-self: end; }
   .edited { padding: .4rem .55rem; border-radius: .4rem; }
 }
@@ -390,6 +398,8 @@ dialog h2 { margin-bottom: 1rem; font-size: 1.35rem; }
   .examples { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .example-button { align-items: flex-start; flex-direction: column; gap: .25rem; }
   .toolbar { grid-template-columns: minmax(0, 1fr); gap: .7rem; }
+  .language-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+  #new-locale { grid-column: 1 / -1; justify-self: start; }
   .metrics { gap: .45rem; }
   .metric { padding: .6rem; }
 }

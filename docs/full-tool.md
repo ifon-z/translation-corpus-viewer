@@ -1,6 +1,6 @@
 # Full edition comparison and interface reference
 
-English · [简体中文](full-tool.zh-CN.md)
+English · [Simplified Chinese](full-tool.zh-CN.md)
 
 The **public edition** runs as a static page over a user-selected JSONL or CSV file. The **full edition** adds a Python CLI and a local web server over a corpus store. [TypeScript declarations](../contracts/full-tool.d.ts) retain the full edition's local HTTP interface and CLI submission modes. They are compile-time definitions only. Opening the public app starts no server and performs no platform requests.
 
@@ -8,14 +8,14 @@ The **public edition** runs as a static page over a user-selected JSONL or CSV f
 
 | Capability | Public edition | Full edition |
 | --- | --- | --- |
-| Inspect translations | Search and filter one imported file | List stored modules and browse entries by module and locale pair |
+| Inspect translations | Search and filter one imported file, with a selector for its target languages | List stored modules and browse entries by module and locale pair |
 | Edit and validate | Edit in the browser, flag empty translations and token or markup differences | Keep edits separately from the captured corpus and compare them with the saved translation |
 | Store and export | Download the full working file as JSONL or CSV | Save JSONL and CSV per module and locale pair, with snapshots and change records |
 | Verify captured data | Validate import structure and translation text | Compare captured pages, exported files, and stored metadata |
 | Catalog and crawler | Request and response declarations | Search or refresh the catalog, crawl selected modules, and report task progress |
 | Submission | Preview and CLI mode declarations | Preview local edits, with a separate CLI mode for live submission |
 
-The public format retains only `id`, `context`, `source`, and `target`. If you have permission to process a full-edition file and need its entry IDs in a public-edition export, map `trk_id` to `id` before importing it. The public export represents edited text and does not include full-edition history or submission metadata.
+The public format retains `id`, `context`, and `source`, with an optional source locale and one or more targets. The [file format reference](../README.md#file-format) covers both the legacy and named-target formats. If you need entry IDs from an authorized full-edition file, map `trk_id` to `id` before importing it. Full-edition history and submission metadata stay in the full edition's store.
 
 ## Full edition CLI
 
@@ -47,4 +47,4 @@ The table describes the full edition's local server. `FullToolHttp` captures the
 | `POST /api/clear` | Locale pair and `trk_id` | Whether a local edit was cleared |
 | `POST /api/submit-preview` | Locale pair | Ready and blocked entries, with warnings |
 
-The local server has no live submission route. See the [responsible-use notice](../NOTICE.md) before implementing or using a separate integration.
+Live submission is a full-edition CLI operation. See the [responsible-use section](../README.md#responsible-use-and-liability) before implementing or using a separate integration.

@@ -8,9 +8,9 @@ The **public edition** runs as a static page over a user-selected JSONL or CSV f
 
 | Capability | Public edition | Full edition |
 | --- | --- | --- |
-| Inspect translations | Search and filter one imported file, with a selector for its target languages | List stored modules and browse entries by module and locale pair |
+| Inspect translations | Switch between open projects, then search and filter entries in the current project and target language | List stored modules and browse entries by module and locale pair |
 | Edit and validate | Edit in the browser, flag empty translations and token or markup differences | Keep edits separately from the captured corpus and compare them with the saved translation |
-| Store and export | Download the full working file as JSONL or CSV | Save JSONL and CSV per module and locale pair, with snapshots and change records |
+| Store and export | Download the current project as JSONL or CSV | Save JSONL and CSV per module and locale pair, with snapshots and change records |
 | Verify captured data | Validate import structure and translation text | Compare captured pages, exported files, and stored metadata |
 | Catalog and crawler | Request and response declarations | Search or refresh the catalog, crawl selected modules, and report task progress |
 | Submission | Preview and CLI mode declarations | Preview local edits, with a separate CLI mode for live submission |

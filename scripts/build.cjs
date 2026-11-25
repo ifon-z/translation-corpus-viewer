@@ -15,6 +15,11 @@ const licenses = [react, reactDom, scheduler].map((path) => {
   return name + " " + version + "\n" + notice
 })
 
+const examples = Object.fromEntries(
+  ["app-ui-demo.csv", "bga-style-demo.jsonl", "multilingual-demo.jsonl"]
+    .map((name) => [name, read("examples/" + name)]),
+)
+
 const { outputFiles } = buildSync({
   absWorkingDir: project,
   entryPoints: ["src/viewer.jsx"],
@@ -26,7 +31,10 @@ const { outputFiles } = buildSync({
   target: "es2020",
   minify: true,
   legalComments: "inline",
-  define: { "process.env.NODE_ENV": '"production"' },
+  define: {
+    "process.env.NODE_ENV": '"production"',
+    __VIEWER_EXAMPLES__: JSON.stringify(examples),
+  },
 })
 
 const script = ("/*! Bundled third-party notices\n\n" + licenses.join("\n\n") + "\n*/\n" + outputFiles[0].text)

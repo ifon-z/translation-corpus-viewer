@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { createRoot } from "react-dom/client"
 import Corpus from "../corpus.js"
-import examples from "../examples/bundled.js"
 import messages from "../i18n.js"
 import draftsApi from "./review-drafts.cjs"
 
@@ -63,7 +62,7 @@ function Header({ t, language, setLanguage, onExport, onFile, reading }) {
         <button type="button" lang="en" aria-pressed={language === "en"} onClick={() => setLanguage("en")}>English</button>
         <button type="button" lang="zh-CN" aria-pressed={language === "zh-CN"} onClick={() => setLanguage("zh-CN")}>简体中文</button>
       </div>
-      <details className="action-menu export-menu">
+      <details className="action-menu">
         <summary className="button">{t("exportShort")}</summary>
         <div className="menu-items">
           <button type="button" onClick={(event) => choose(event, () => onExport("csv"))}>{t("exportCsv")}</button>
@@ -261,7 +260,7 @@ function openProject(id, name, text, example) {
 function App() {
   const [language, setLanguage] = useState("en")
   const [projects, setProjects] = useState(() => demoFiles.map(([file, label]) =>
-    openProject(file, file, examples[file], label)))
+    openProject(file, file, __VIEWER_EXAMPLES__[file], label)))
   const [activeId, setActiveId] = useState(demoFiles[0][0])
   const [reading, setReading] = useState(false)
   const [importError, setImportError] = useState(null)

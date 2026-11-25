@@ -1,4 +1,0 @@
-id,context,source,target
-demo-01,Lantern Trial,Place ${stones} glowstones beside the lilac arch.,把 ${stones} 颗荧光石放在丁香拱门旁。
-demo-02,Paper Comet,"Fold the map twice, then follow the [blue]paper comet[/blue].",
-demo-03,Moon Garden,The seed drawer opens at {hour}.,种子抽屉会准时打开。

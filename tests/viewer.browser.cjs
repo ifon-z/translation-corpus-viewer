@@ -64,6 +64,8 @@ async function verify() {
     await page.getByText("Showing 0 of 3", { exact: true }).waitFor()
     await filterPicker.selectOption({ label: "All entries" })
 
+    await loadExample(page, "BGA-style board game")
+    await page.getByText("Showing 6 of 6", { exact: true }).waitFor()
     await loadExample(page, "Multilingual field guide")
     await page.getByText("Showing 3 of 3", { exact: true }).waitFor()
     const toEnglish = page.getByRole("tab", { name: /^English/ })

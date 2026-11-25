@@ -7,8 +7,7 @@ const { chromium } = require("playwright-core")
 const Corpus = require("../corpus.js")
 
 async function loadExample(page, name) {
-  await page.getByText("Examples", { exact: true }).click()
-  await page.getByRole("button", { name, exact: true }).click()
+  await page.getByRole("combobox", { name: "Project", exact: true }).selectOption({ label: name })
 }
 
 async function exportFile(page, label) {
@@ -68,6 +67,8 @@ async function verify() {
     await page.getByRole("button", { name: "简体中文", exact: true }).click()
     await page.getByRole("heading", { name: "翻译审校" }).waitFor()
     assert.equal(await page.locator("html").getAttribute("lang"), "zh-CN")
+    const chineseProject = page.getByRole("combobox", { name: "项目", exact: true })
+    assert.equal(await chineseProject.locator("option:checked").innerText(), "多语言野外指南")
     assert.equal(await page.getByRole("searchbox", { name: "搜索" }).inputValue(), "Look for the mist gate")
     assert.equal(await page.getByRole("tab", { name: /^阿拉伯语/ }).getAttribute("aria-selected"), "true")
     assert.equal(await page.getByRole("button", { name: "简体中文", exact: true }).getAttribute("aria-pressed"), "true")
@@ -143,14 +144,23 @@ async function verify() {
     })
     await page.waitForFunction(() => typeof window.finishTestImport === "function")
     await page.locator("#review-translation").fill("打开草稿")
-    const confirmation = page.waitForEvent("dialog").then(async (dialog) => {
-      assert.match(dialog.message(), /not been exported/)
-      await dialog.dismiss()
-    })
+    await page.getByRole("searchbox", { name: "Search" }).fill("ui-demo-01")
     await page.evaluate(() => window.finishTestImport())
-    await confirmation
     await page.evaluate(() => window.restoreTestRead())
-    await page.waitForFunction(() => !document.getElementById("import").disabled)
+    await page.getByRole("heading", { name: "Fictional draft", exact: true }).waitFor()
+    const projects = page.getByRole("combobox", { name: "Project", exact: true })
+    assert.equal(await projects.locator("option:checked").innerText(), "slow.jsonl")
+    assert.equal(await page.getByRole("searchbox", { name: "Search" }).inputValue(), "")
+    await page.locator("#review-translation").fill("Second project draft")
+    await loadExample(page, "Application UI copy")
+    assert.equal(await page.getByRole("searchbox", { name: "Search" }).inputValue(), "ui-demo-01")
+    assert.equal(await page.locator("#review-translation").inputValue(), "打开草稿")
+    assert.equal(await page.getByRole("tab", { name: /^Chinese/ }).getAttribute("aria-selected"), "true")
+    assert.equal(await page.locator("#translation-status").evaluate(status =>
+      !status.closest(".translation-field") && Boolean(status.closest(".review-actions"))), true)
+    await projects.selectOption({ label: "slow.jsonl" })
+    assert.equal(await page.locator("#review-translation").inputValue(), "Second project draft")
+    await loadExample(page, "Application UI copy")
     await page.getByRole("button", { name: "Save translation" }).click()
     const edited = Corpus.parse(await exportFile(page, "Export JSONL"), "edit.jsonl")
     assert.equal(edited[0].source_locale, "en")
@@ -163,6 +173,23 @@ async function verify() {
     assert.equal(await extended.getAttribute("aria-selected"), "true")
     const extendedExport = Corpus.parse(await exportFile(page, "Export JSONL"), "extended.jsonl")
     assert.equal(extendedExport[0].translations["en-US-u-ca-gregory"], "")
+    const imported = (name, source) => ({
+      name, mimeType: "application/x-ndjson", buffer: Buffer.from(JSON.stringify({ source, target: "" })),
+    })
+    await page.getByLabel("Import JSONL or CSV").setInputFiles([
+      imported("alpha.jsonl", "Alpha source"),
+      { name: "broken.jsonl", mimeType: "application/x-ndjson", buffer: Buffer.from("{not valid}") },
+      imported("beta.jsonl", "Beta source"),
+    ])
+    await page.getByRole("heading", { name: "Alpha source", exact: true }).waitFor()
+    await page.getByText(/Could not import broken.jsonl/).waitFor()
+    await projects.selectOption({ label: "beta.jsonl" })
+    assert.equal(await page.locator(".source-text").textContent(), "Beta source")
+    const beta = Corpus.parse(await exportFile(page, "Export JSONL"), "beta-export.jsonl")
+    assert.deepEqual(beta.map(row => row.source), ["Beta source"])
+    await projects.selectOption({ label: "slow.jsonl" })
+    assert.equal(await page.locator("#review-translation").inputValue(), "Second project draft")
+
     if (process.env.VIEWER_SCREENSHOT) {
       await page.setViewportSize({ width: 1487, height: 1058 })
       const example = [
@@ -179,10 +206,15 @@ async function verify() {
       await page.getByRole("button", { name: /Navigation/ }).click()
       await page.locator("#review-translation").focus()
       await page.screenshot({ path: process.env.VIEWER_SCREENSHOT, fullPage: true })
+      if (process.env.VIEWER_MOBILE_SCREENSHOT) {
+        await page.setViewportSize({ width: 390, height: 844 })
+        await page.getByRole("button", { name: "简体中文", exact: true }).click()
+        await page.screenshot({ path: process.env.VIEWER_MOBILE_SCREENSHOT, fullPage: true })
+      }
     }
     assert.deepEqual(errors, [])
     assert.deepEqual(requests, [])
-    console.log("Checked the standalone HTML in offline Edge: keyboard tabs, bilingual state, mobile scrolling, editing, JSONL/CSV exports, and delayed import.")
+    console.log("Checked the standalone HTML in offline Edge: keyboard tabs, bilingual state, mobile scrolling, saved and staged edits, isolated projects, JSONL/CSV exports, and batch import.")
   } finally {
     await browser?.close()
     rmSync(html, { force: true })

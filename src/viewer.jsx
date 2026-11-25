@@ -7,9 +7,9 @@ import draftsApi from "./review-drafts.cjs"
 
 const { draftKey, updateDraft, nameDrafts, saveDrafts } = draftsApi
 const demoFiles = [
+  ["multilingual-demo.jsonl", "multilingual"],
   ["bga-style-demo.jsonl", "boardGame"],
   ["app-ui-demo.csv", "appCopy"],
-  ["multilingual-demo.jsonl", "multilingual"],
 ]
 const filters = ["all", "issues", "untranslated", "edited"]
 
@@ -46,7 +46,7 @@ function navigate(event, position, length, backward, forward) {
   return next
 }
 
-function Header({ t, language, setLanguage, canExport, onExport, onFile, onExample, reading }) {
+function Header({ t, language, setLanguage, onExport, onFile, reading }) {
   const choose = (event, action) => {
     event.currentTarget.closest("details").open = false
     action()
@@ -55,28 +55,21 @@ function Header({ t, language, setLanguage, canExport, onExport, onFile, onExamp
     <h1>{t("title")}</h1>
     <div className="header-actions">
       <label className="button import-button">
-        {t("importShort")}
-        <input id="import" type="file" accept=".jsonl,.csv" aria-label={t("importLabel")}
+        {t(reading ? "importing" : "importShort")}
+        <input id="import" type="file" accept=".jsonl,.csv" multiple aria-label={t("importLabel")}
           onChange={onFile} disabled={reading} />
       </label>
-      <details className="action-menu">
-        <summary className="button">{t("examplesShort")}</summary>
-        <div className="menu-items">
-          {demoFiles.map(([file, key]) => <button key={file} type="button"
-            onClick={(event) => choose(event, () => onExample(file))}>{t(key)}</button>)}
-        </div>
-      </details>
       <div className="ui-language" role="group" aria-label={t("uiLanguage")}>
         <button type="button" lang="en" aria-pressed={language === "en"} onClick={() => setLanguage("en")}>English</button>
         <button type="button" lang="zh-CN" aria-pressed={language === "zh-CN"} onClick={() => setLanguage("zh-CN")}>简体中文</button>
       </div>
-      {canExport ? <details className="action-menu export-menu">
+      <details className="action-menu export-menu">
         <summary className="button">{t("exportShort")}</summary>
         <div className="menu-items">
           <button type="button" onClick={(event) => choose(event, () => onExport("csv"))}>{t("exportCsv")}</button>
           <button type="button" onClick={(event) => choose(event, () => onExport("jsonl"))}>{t("exportJsonl")}</button>
         </div>
-      </details> : <button className="button" type="button" disabled>{t("exportShort")}</button>}
+      </details>
     </div>
   </header>
 }
@@ -87,23 +80,42 @@ function Badge({ t, issues, draft }) {
   return <span className={"badge " + tone}>{label}</span>
 }
 
-function ReviewList({ t, rows, selected, onSelect, drafts, activeTarget, disabled, search, setSearch,
+function ProjectSelect({ t, projects, activeId, onSelect }) {
+  const imports = projects.filter((project) => !project.example)
+  return <label className="project-select">
+    <span>{t("project")}</span>
+    <select value={activeId} onChange={(event) => onSelect(event.target.value)}>
+      {imports.length > 0 && <optgroup label={t("importedProjects")}>
+        {imports.map(({ id, name, occurrence }) => <option key={id} value={id}>
+          {occurrence > 1 ? name + " (" + occurrence + ")" : name}
+        </option>)}
+      </optgroup>}
+      <optgroup label={t("sampleProjects")}>
+        {projects.filter((project) => project.example).map(({ id, example }) =>
+          <option key={id} value={id}>{t(example)}</option>)}
+      </optgroup>
+    </select>
+  </label>
+}
+
+function ReviewList({ t, projects, activeId, onProject, rows, selected, onSelect, drafts, activeTarget, search, setSearch,
   filter, setFilter, searchInput, total, message }) {
   const list = useRef(null)
   useLayoutEffect(() => {
     reveal(list.current?.querySelector('[aria-current="true"]'), false)
-  }, [selected?.index, rows.length])
+  }, [activeId, selected?.index, rows.length])
 
   return <aside className="review-list" aria-label={t("entryList")}>
+    <ProjectSelect t={t} projects={projects} activeId={activeId} onSelect={onProject} />
     <div className="list-controls">
       <label>
         <span className="sr-only">{t("search")}</span>
         <input ref={searchInput} type="search" placeholder={t("searchEntries")} autoComplete="off" spellCheck={false}
-          disabled={disabled} value={search} onChange={(event) => setSearch(event.target.value)} />
+          value={search} onChange={(event) => setSearch(event.target.value)} />
       </label>
       <label>
         <span className="sr-only">{t("filter")}</span>
-        <select disabled={disabled} value={filter} onChange={(event) => setFilter(event.target.value)}>
+        <select value={filter} onChange={(event) => setFilter(event.target.value)}>
           {filters.map((key) => <option key={key} value={key}>{t(key)}</option>)}
         </select>
       </label>
@@ -132,7 +144,7 @@ function ReviewList({ t, rows, selected, onSelect, drafts, activeTarget, disable
     </ul>}
     <div className="list-summary">
       <span role="status">{message}</span>
-      {!disabled && <span aria-live="polite">{t("count", { shown: rows.length, total })}</span>}
+      <span aria-live="polite">{t("count", { shown: rows.length, total })}</span>
     </div>
   </aside>
 }
@@ -187,7 +199,6 @@ function ReviewEditor({ t, row, tag, sourceLocale, languageName, draft, onDraft,
       <div className="target-pane">
         <label htmlFor="review-translation">{targetLabel}</label>
         <div className="translation-field" key={draftKey(row.index, tag)}>
-          <span className="field-badge" id="translation-status"><Badge t={t} issues={issues} /></span>
           <textarea id="review-translation" lang={tag || undefined} dir="auto" spellCheck={false}
             autoComplete="off" aria-describedby="translation-status" value={text}
             onChange={(event) => onDraft(event.target.value)}
@@ -205,7 +216,12 @@ function ReviewEditor({ t, row, tag, sourceLocale, languageName, draft, onDraft,
         <button type="button" className="button" disabled={!previous} onClick={() => onSelect(previous.index)}>{t("previous")}</button>
         <button type="button" className="button" disabled={!next} onClick={() => onSelect(next.index)}>{t("next")}</button>
       </div>
-      <button type="button" className="button primary" disabled={!draft} onClick={onSave}>{t("save")}</button>
+      <div className="save-actions">
+        <span id="translation-status" className="translation-status" role="status">
+          <Badge t={t} issues={issues} />
+        </span>
+        <button type="button" className="button primary" disabled={!draft} onClick={onSave}>{t("save")}</button>
+      </div>
     </div>
   </>
 }
@@ -234,28 +250,33 @@ function LocaleDialog({ t, dialog, onClose, onChange, onSave }) {
   </dialog>
 }
 
+function openProject(id, name, text, example) {
+  const workspace = Corpus.open(Corpus.parse(text, name))
+  return {
+    id, name, example, workspace, activeTarget: workspace.targetLocales[0], selectedIndex: 0,
+    search: "", filter: "all", dirty: false, drafts: new Map(), message: null,
+  }
+}
+
 function App() {
   const [language, setLanguage] = useState("en")
-  const [workspace, setWorkspace] = useState(null)
-  const [filename, setFilename] = useState("")
-  const [activeTarget, setActiveTarget] = useState("")
-  const [selectedIndex, setSelectedIndex] = useState(0)
-  const [search, setSearch] = useState("")
-  const [filter, setFilter] = useState("all")
-  const [dirty, setDirty] = useState(false)
-  const [drafts, setDrafts] = useState(() => new Map())
+  const [projects, setProjects] = useState(() => demoFiles.map(([file, label]) =>
+    openProject(file, file, examples[file], label)))
+  const [activeId, setActiveId] = useState(demoFiles[0][0])
   const [reading, setReading] = useState(false)
-  const [message, setMessage] = useState({ key: "waiting" })
+  const [importError, setImportError] = useState(null)
   const [dialog, setDialog] = useState(null)
-  const hasChanges = dirty || drafts.size > 0
-  const current = useRef({ hasChanges: false, dialog: null, language: "en" })
-  const importVersion = useRef(0)
+  const active = projects.find((project) => project.id === activeId)
+  const { workspace, activeTarget, selectedIndex, search, filter, drafts, message } = active
+  const hasChanges = projects.some((project) => project.dirty || project.drafts.size > 0)
+  const view = useRef({ activeId, dialog })
+  const fileSequence = useRef(0)
   const searchInput = useRef(null)
   const t = (key, values = {}) => messages[language][key].replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "")
   const languageNames = useMemo(() => new Intl.DisplayNames([language], { type: "language" }), [language])
   const languageName = (tag) => tag ? languageNames.of(new Intl.Locale(tag).baseName) : t("unnamed")
 
-  useLayoutEffect(() => { current.current = { hasChanges, dialog, language } })
+  useLayoutEffect(() => { view.current = { activeId, dialog } })
   useEffect(() => {
     document.documentElement.lang = language
     document.title = messages[language].title
@@ -267,7 +288,7 @@ function App() {
     return () => window.removeEventListener("beforeunload", warn)
   }, [hasChanges])
 
-  const rows = useMemo(() => (workspace?.entries ?? []).map((entry, index) => {
+  const rows = useMemo(() => workspace.entries.map((entry, index) => {
     const text = entry.translations.get(activeTarget) ?? ""
     return { entry, index, text, issues: Corpus.issues({ source: entry.source, target: text }),
       edited: text !== (entry.originalTranslations.get(activeTarget) ?? "") }
@@ -277,8 +298,8 @@ function App() {
   const selectedPosition = Math.max(0, shown.findIndex((row) => row.index === selectedIndex))
   const selected = shown[selectedPosition]
   const selectedDraft = selected && drafts.get(draftKey(selected.index, activeTarget))
-  const targetIndex = workspace?.targetLocales.indexOf(activeTarget) ?? -1
-  const targetAction = workspace?.targetLocales[0] === "" ? "nameTarget" : "addTarget"
+  const targetIndex = workspace.targetLocales.indexOf(activeTarget)
+  const targetAction = workspace.targetLocales[0] === "" ? "nameTarget" : "addTarget"
 
   function errorMessage(error) {
     const details = error.details ?? {}
@@ -287,41 +308,50 @@ function App() {
     return details.position ? t(details.format + "Location", { position: details.position, error: text }) : text
   }
 
-  function loadCorpus(text, name) {
-    if (current.current.dialog) {
-      setMessage({ key: "finishDialog" })
-      return
-    }
-    try {
-      const next = Corpus.open(Corpus.parse(text, name))
-      if (current.current.hasChanges && !window.confirm(messages[current.current.language].replaced)) return
-      importVersion.current += 1
-      setWorkspace(next)
-      setActiveTarget(next.targetLocales[0])
-      setSelectedIndex(0)
-      setFilename(name.replace(/\.[^.]+$/, ""))
-      setMessage({ key: "imported", values: { name } })
-      setSearch("")
-      setFilter("all")
-      setDrafts(new Map())
-      setDirty(false)
-    } catch (error) {
-      setMessage({ key: "importError", error })
-    }
+  function updateProject(changes) {
+    setProjects((previous) => previous.map((project) => project.id === activeId
+      ? { ...project, ...(typeof changes === "function" ? changes(project) : changes) } : project))
+  }
+
+  function selectProject(id) {
+    setImportError(null)
+    setActiveId(id)
   }
 
   async function importFile(event) {
     const input = event.currentTarget
-    const file = input.files[0]
-    if (!file) return
-    const version = importVersion.current
+    const files = Array.from(input.files)
+    if (files.length === 0) return
     setReading(true)
+    setImportError(null)
     try {
-      if (!/\.(jsonl|csv)$/i.test(file.name)) throw { code: "invalidFile" }
-      const text = await file.text()
-      if (version === importVersion.current) loadCorpus(text, file.name)
-    } catch (error) {
-      if (version === importVersion.current) setMessage({ key: "importError", error })
+      const results = await Promise.all(files.map(async (file) => {
+        try {
+          if (!/\.(jsonl|csv)$/i.test(file.name)) throw { code: "invalidFile" }
+          const id = "file-" + ++fileSequence.current
+          const project = openProject(id, file.name, await file.text())
+          return { project: { ...project, message: { key: "imported", values: { name: file.name } } } }
+        } catch (error) {
+          return { name: file.name, error }
+        }
+      }))
+      const imported = results.flatMap(({ project }) => project ? [project] : [])
+      const failures = results.filter(({ error }) => error)
+      if (imported.length) {
+        setProjects((previous) => {
+          const occurrences = new Map()
+          for (const project of previous) {
+            if (!project.example) occurrences.set(project.name, project.occurrence)
+          }
+          return [...previous, ...imported.map((project) => {
+            const occurrence = (occurrences.get(project.name) ?? 0) + 1
+            occurrences.set(project.name, occurrence)
+            return { ...project, occurrence }
+          })]
+        })
+        if (view.current.activeId === activeId && !view.current.dialog) setActiveId(imported[0].id)
+      }
+      setImportError(failures.length ? failures : null)
     } finally {
       input.value = ""
       setReading(false)
@@ -330,17 +360,16 @@ function App() {
 
   function saveSelected() {
     if (!selectedDraft) return
-    setWorkspace(saveDrafts(workspace, [selectedDraft]))
-    setDrafts((previous) => updateDraft(previous, selectedDraft, selectedDraft.text))
     const text = selectedDraft.text
     const updated = { ...selected, text,
       issues: Corpus.issues({ source: selected.entry.source, target: text }),
       edited: text !== (selected.entry.originalTranslations.get(activeTarget) ?? "") }
-    if (!visible(updated, filter, query)) {
-      setSelectedIndex(shown[selectedPosition + 1]?.index ?? shown[selectedPosition - 1]?.index ?? selected.index)
-    }
-    setDirty(true)
-    setMessage({ key: "saved" })
+    const nextIndex = visible(updated, filter, query)
+      ? selected.index : shown[selectedPosition + 1]?.index ?? shown[selectedPosition - 1]?.index ?? selected.index
+    const remaining = new Map(drafts)
+    remaining.delete(draftKey(selected.index, activeTarget))
+    updateProject({ workspace: saveDrafts(workspace, [selectedDraft]), drafts: remaining,
+      selectedIndex: nextIndex, dirty: true, message: { key: "saved" } })
   }
 
   function saveLocale(event) {
@@ -354,24 +383,22 @@ function App() {
     }
     if (dialog.kind === "source") {
       if (workspace.sourceLocale !== code) {
-        setWorkspace({ ...workspace, sourceLocale: code })
-        setDirty(true)
-        setMessage({ key: "sourceUpdated" })
+        updateProject({ workspace: { ...workspace, sourceLocale: code }, dirty: true, message: { key: "sourceUpdated" } })
       }
     } else {
-      if (!workspace.targetLocales.includes(code)) {
+      if (workspace.targetLocales.includes(code)) {
+        updateProject({ activeTarget: code })
+      } else {
         const next = { ...workspace, targetLocales: [...workspace.targetLocales] }
-        if (next.targetLocales[0] === "") {
+        const unnamed = next.targetLocales[0] === ""
+        if (unnamed) {
           next.entries = next.entries.map((entry) => ({ ...entry,
             translations: new Map(entry.translations), originalTranslations: new Map(entry.originalTranslations) }))
-          setDrafts((previous) => nameDrafts(previous, code))
         }
         Corpus.addTarget(next, code)
-        setWorkspace(next)
-        setDirty(true)
-        setMessage({ key: "targetUpdated" })
+        updateProject({ workspace: next, drafts: unnamed ? nameDrafts(drafts, code) : drafts,
+          activeTarget: code, dirty: true, message: { key: "targetUpdated" } })
       }
-      setActiveTarget(code)
     }
     setDialog(null)
   }
@@ -383,51 +410,50 @@ function App() {
     const url = URL.createObjectURL(new Blob([content], { type: mime + ";charset=utf-8" }))
     const link = document.createElement("a")
     link.href = url
-    link.download = filename + "-edited." + format
+    link.download = active.name.replace(/\.[^.]+$/, "") + "-edited." + format
     link.click()
     setTimeout(() => URL.revokeObjectURL(url), 1000)
-    setWorkspace(next)
-    setDrafts(new Map())
-    setDirty(false)
-    setMessage({ key: "download", values: { format: format.toUpperCase() } })
+    updateProject({ workspace: next, drafts: new Map(), dirty: false,
+      message: { key: "download", values: { format: format.toUpperCase() } } })
   }
 
   function clearFilters() {
-    setSearch("")
-    setFilter("all")
+    updateProject({ search: "", filter: "all" })
     searchInput.current.focus()
   }
 
+  const selectEntry = (index) => updateProject({ selectedIndex: index })
+  const feedback = importError
+    ? importError.map(({ name, error }) => t("importError", { name, error: errorMessage(error) })).join(" ")
+    : message && t(message.key, message.values)
+
   return <div className="app-shell">
-    <Header t={t} language={language} setLanguage={setLanguage} canExport={Boolean(workspace)}
-      onExport={exportFile} onFile={importFile} onExample={(name) => loadCorpus(examples[name], name)} reading={reading} />
+    <Header t={t} language={language} setLanguage={setLanguage}
+      onExport={exportFile} onFile={importFile} reading={reading} />
     <div className="review-layout">
-      <ReviewList t={t} rows={shown} selected={selected} onSelect={setSelectedIndex} drafts={drafts}
-        activeTarget={activeTarget} disabled={!workspace} search={search} setSearch={setSearch}
-        filter={filter} setFilter={setFilter} searchInput={searchInput} total={rows.length}
-        message={t(message.key, message.error ? { error: errorMessage(message.error) } : message.values)} />
-      <main className="review-main">
-        {workspace && <>
-          {selected && <h2 className="entry-title">{selected.entry.context || selected.entry.id || selected.entry.source}</h2>}
-          <LanguageControls t={t} language={language} workspace={workspace} activeTarget={activeTarget}
-            languageName={languageName} onTarget={setActiveTarget}
-            onSourceEdit={() => setDialog({ kind: "source", value: workspace.sourceLocale, title: t("changeSource") })}
-            onTargetEdit={() => setDialog({ kind: "target", value: "", title: t(targetAction) })} />
-        </>}
-        <div id="translation-panel" role={workspace ? "tabpanel" : undefined}
-          aria-labelledby={targetIndex >= 0 ? "target-tab-" + targetIndex : undefined}>
+      <ReviewList t={t} projects={projects} activeId={activeId} onProject={selectProject}
+        rows={shown} selected={selected} onSelect={selectEntry} drafts={drafts}
+        activeTarget={activeTarget} search={search} setSearch={(search) => updateProject({ search })}
+        filter={filter} setFilter={(filter) => updateProject({ filter })} searchInput={searchInput}
+        total={rows.length} message={feedback} />
+      <main className="review-main" key={activeId}>
+        {selected && <h2 className="entry-title">{selected.entry.context || selected.entry.id || selected.entry.source}</h2>}
+        <LanguageControls t={t} language={language} workspace={workspace} activeTarget={activeTarget}
+          languageName={languageName} onTarget={(tag) => updateProject({ activeTarget: tag })}
+          onSourceEdit={() => setDialog({ kind: "source", value: workspace.sourceLocale, title: t("changeSource") })}
+          onTargetEdit={() => setDialog({ kind: "target", value: "", title: t(targetAction) })} />
+        <div id="translation-panel" role="tabpanel" aria-labelledby={"target-tab-" + targetIndex}>
           {selected ? <ReviewEditor t={t} row={selected} tag={activeTarget}
             sourceLocale={workspace.sourceLocale} languageName={languageName} draft={selectedDraft}
-            onDraft={(text) => setDrafts((previous) => updateDraft(previous,
-              { index: selected.index, tag: activeTarget, text }, selected.text))}
+            onDraft={(text) => updateProject((project) => ({
+              drafts: updateDraft(project.drafts, { index: selected.index, tag: activeTarget, text }, selected.text),
+            }))}
             onSave={saveSelected} previous={shown[selectedPosition - 1]} next={shown[selectedPosition + 1]}
-            onSelect={setSelectedIndex} />
+            onSelect={selectEntry} />
             : <div className="empty-state">
-              <h2>{t(workspace ? "emptyTitle" : "startTitle")}</h2>
-              <p>{workspace ? t("emptyForTarget", { language: languageName(activeTarget) }) : t("startHelp")}</p>
-              {workspace && (query || filter !== "all") && <button type="button" className="button" onClick={clearFilters}>
-                {t("clearFilters")}
-              </button>}
+              <h2>{t("emptyTitle")}</h2>
+              <p>{t("emptyForTarget", { language: languageName(activeTarget) })}</p>
+              <button type="button" className="button" onClick={clearFilters}>{t("clearFilters")}</button>
             </div>}
         </div>
       </main>

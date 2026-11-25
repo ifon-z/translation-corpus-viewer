@@ -21,6 +21,7 @@
   --outline: #ccd2c8;
   --accent: #265949;
   --accent-hover: #194637;
+  --dropdown-shadow: 0 .45rem 1.35rem #1d39231c;
   --selected: #e3ece3;
   --heading: Georgia, "Noto Serif CJK SC", "Songti SC", SimSun, serif;
 }
@@ -107,7 +108,18 @@ button, input, select, textarea, summary { font: inherit; color: inherit; }
 }
 .ui-language button[aria-pressed="true"] { background: var(--selected); color: var(--accent-hover); }
 .action-menu { position: relative; }
-.action-menu summary { list-style: none; }
+.action-menu summary { gap: .55rem; list-style: none; }
+.action-menu summary::after {
+  content: "";
+  width: .37rem;
+  height: .37rem;
+  margin-block-start: -.15rem;
+  border-inline-end: 1.5px solid var(--accent);
+  border-block-end: 1.5px solid var(--accent);
+  rotate: 45deg;
+}
+.action-menu[open] summary { border-color: var(--accent); background: var(--selected); }
+.action-menu[open] summary::after { margin-block-start: .15rem; rotate: 225deg; }
 .action-menu summary::-webkit-details-marker { display: none; }
 .menu-items {
   position: absolute;
@@ -115,24 +127,26 @@ button, input, select, textarea, summary { font: inherit; color: inherit; }
   top: calc(100% + .4rem);
   right: 0;
   display: grid;
-  min-width: 9rem;
+  min-width: max(9rem, 100%);
   padding: .25rem;
   border: 1px solid var(--line);
-  border-radius: .45rem;
+  border-radius: .55rem;
   background: var(--paper);
-  box-shadow: 0 .3rem 1.2rem #1d392314;
+  box-shadow: var(--dropdown-shadow);
 }
 .menu-items button {
   border: 0;
   border-radius: .28rem;
   background: none;
-  padding: .5rem .65rem;
+  min-height: 2.4rem;
+  padding: .45rem .55rem;
   font-size: .875rem;
   text-align: start;
   white-space: nowrap;
   cursor: pointer;
 }
-.menu-items button:hover { background: var(--selected); }
+.menu-items button:hover, .menu-items button:focus-visible { background: var(--selected); }
+.menu-items button:focus-visible { outline-offset: -2px; }
 
 .review-layout {
   display: grid;
@@ -169,6 +183,75 @@ button, input, select, textarea, summary { font: inherit; color: inherit; }
   font-size: .86rem;
 }
 .project-select select { min-height: 2.8rem; color: var(--accent-hover); font-weight: 650; }
+
+.project-select select, .list-controls select { cursor: pointer; }
+.project-select select:hover, .list-controls select:hover { border-color: #89a398; }
+
+@supports (appearance: base-select) and selector(::picker(select)) {
+  .review-list select, .review-list select::picker(select) { appearance: base-select; }
+  .review-list select { align-items: center; gap: .65rem; overflow: hidden; text-overflow: ellipsis; }
+  .review-list select::picker-icon {
+    content: "";
+    width: .37rem;
+    height: .37rem;
+    margin-block-start: -.15rem;
+    border-inline-end: 1.5px solid var(--accent);
+    border-block-end: 1.5px solid var(--accent);
+    rotate: 45deg;
+  }
+  .review-list select:open {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .review-list select:open::picker-icon { margin-block-start: .15rem; rotate: 225deg; }
+  .review-list select::picker(select) {
+    min-inline-size: anchor-size(width);
+    max-inline-size: calc(100vw - 2rem);
+    max-block-size: min(21rem, 55vh);
+    margin-block: .35rem;
+    padding: .3rem;
+    overflow: auto;
+    scrollbar-width: thin;
+    border: 1px solid var(--outline);
+    border-radius: .55rem;
+    background: var(--paper);
+    color: var(--text);
+    box-shadow: var(--dropdown-shadow);
+  }
+  .review-list optgroup {
+    color: var(--muted);
+    font-size: .74rem;
+    font-weight: 620;
+  }
+  .review-list optgroup + optgroup {
+    margin-block-start: .25rem;
+    padding-block-start: .2rem;
+    border-top: 1px solid var(--line);
+  }
+  .review-list option {
+    min-block-size: 2.4rem;
+    gap: .65rem;
+    padding: .45rem .55rem;
+    border-radius: .28rem;
+    color: var(--text);
+    font-size: .875rem;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+  }
+  .review-list option:checked {
+    background: var(--selected);
+    color: var(--accent-hover);
+    font-weight: 640;
+  }
+  .review-list option::checkmark { order: 1; margin-inline-start: auto; }
+  .review-list option:hover, .review-list option:focus-visible {
+    background: var(--selected);
+    outline: 1px solid #89a398;
+    outline-offset: -1px;
+  }
+}
+
 .list-controls {
   display: grid;
   gap: .52rem;

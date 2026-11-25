@@ -11,7 +11,7 @@ async function loadExample(page, name) {
 }
 
 async function exportFile(page, label) {
-  await page.getByText(label.startsWith("导出") ? "导出" : "Export", { exact: true }).click()
+  await page.getByText(label.startsWith("导出") ? "导出" : "Export", { exact: true }).press("Enter")
   const [download] = await Promise.all([
     page.waitForEvent("download"),
     page.getByRole("button", { name: label, exact: true }).click(),
@@ -40,6 +40,30 @@ async function verify() {
     page.on("pageerror", (error) => errors.push(error.message))
     await page.goto(pathToFileURL(html).href)
     await page.getByRole("heading", { name: "Translation Review" }).waitFor()
+    const projectPicker = page.getByRole("combobox", { name: "Project", exact: true })
+    const filterPicker = page.getByRole("combobox", { name: "Filter", exact: true })
+    const enhanced = await page.evaluate(() => CSS.supports("appearance", "base-select")
+      && CSS.supports("selector(::picker(select))"))
+    if (enhanced) {
+      for (const picker of [projectPicker, filterPicker]) {
+        assert.equal(await picker.evaluate(node => getComputedStyle(node).appearance), "base-select")
+        await picker.press("Space")
+        await page.waitForFunction(() => Boolean(document.querySelector("select:open")))
+        await page.keyboard.press("Escape")
+        await page.waitForFunction(() => !document.querySelector("select:open"))
+        assert.equal(await picker.evaluate(node => document.activeElement === node), true)
+      }
+    }
+    if (process.env.VIEWER_DROPDOWN_SCREENSHOT && enhanced) {
+      await projectPicker.click()
+      await page.waitForFunction(() => Boolean(document.querySelector("select:open")))
+      await page.screenshot({ path: process.env.VIEWER_DROPDOWN_SCREENSHOT })
+      await page.keyboard.press("Escape")
+    }
+    await filterPicker.selectOption({ label: "Untranslated" })
+    await page.getByText("Showing 0 of 3", { exact: true }).waitFor()
+    await filterPicker.selectOption({ label: "All entries" })
+
     await loadExample(page, "Multilingual field guide")
     await page.getByText("Showing 3 of 3", { exact: true }).waitFor()
     const toEnglish = page.getByRole("tab", { name: /^English/ })

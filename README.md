@@ -6,24 +6,25 @@ Browse, search, edit, and validate a local corpus with one source language and o
 
 ## Quick start
 
-1. Save [index.html](index.html) from its raw view or download it in the repository ZIP. Double-click the file to open it in your browser. The **English** and **Simplified Chinese** buttons switch the interface.
-2. Select a local JSONL or CSV file, or load a fictional example from the sidebar. The example files are also available below.
+1. Save [index.html](index.html) from its raw view or download it in the repository ZIP. Double-click the file to open it in your browser. Use the language switch at the top to choose English or Simplified Chinese.
+2. Choose **Import file** to open a local JSONL or CSV file, or load a fictional corpus from **Examples**. The example files are also available below.
 3. Click the displayed **Source language** to change it. Select a **Target language** tab to search, filter, validate, or edit that translation. The arrow keys move between tabs. Use **Add target language** to add another. In a legacy file, **Name target language** labels the existing translations first.
-4. Export the full corpus and all target languages as JSONL or CSV. Reopen the exported file to continue editing later.
+4. Select an entry in the left list and edit its translation next to the source. Use **Save translation** to apply the edit in the current page. **Previous** and **Next** move through the filtered list.
+5. Choose **Export** to save the full corpus as JSONL or CSV, including every target language and any pending drafts. Reopen the exported file to continue editing later.
 
 The HTML file contains the React viewer, styles, and fictional examples. Move it anywhere and open it offline. Edits stay in the current page until you save an export. Search and filters affect the display only.
 
 ### Example 1 — A BGA-style board game
 
-Load **BGA-style board game** or import the [board-game JSONL](examples/bga-style-demo.jsonl). It contains six invented English–Chinese entries. Select **Validation alerts** to find a blank translation, a missing placeholder, and missing markup. Edit `orchard-demo-03` so the translation keeps `{bellTime}`, then export JSONL to save the draft.
+In **Examples**, load **BGA-style board game** or import the [board-game JSONL](examples/bga-style-demo.jsonl). It contains six invented English–Chinese entries. Select **Validation alerts** to find a blank translation, a missing placeholder, and missing markup. Edit `orchard-demo-03` so the translation keeps `{bellTime}`, then export JSONL to save the draft.
 
 ### Example 2 — Localizing a writing app
 
-Load **Application UI copy** or import the [application UI CSV](examples/app-ui-demo.csv). Review navigation labels, status messages, and a multiline export instruction in a fictional writing app. Use **Untranslated** to find `ui-demo-04` and fill in its translation. Export CSV to hand the copy back to a teammate.
+In **Examples**, load **Application UI copy** or import the [application UI CSV](examples/app-ui-demo.csv). Review navigation labels, status messages, and a multiline export instruction in a fictional writing app. Use **Untranslated** to find `ui-demo-04` and fill in its translation. Export CSV to hand the copy back to a teammate.
 
 ### Example 3 — A multilingual field guide
 
-Load **Multilingual field guide** or import its [fictional JSONL](examples/multilingual-demo.jsonl). The Spanish source has English, Simplified Chinese, and Arabic targets. Switch to Arabic and select **Untranslated** to find `guide-demo-02`. Switch back to English to see that the same entry already has a translation. Export either format to keep all three targets.
+In **Examples**, load **Multilingual field guide** or import its [fictional JSONL](examples/multilingual-demo.jsonl). The Spanish source has English, Simplified Chinese, and Arabic targets. Switch to Arabic and select **Untranslated** to find `guide-demo-02`. Switch back to English to see that the same entry already has a translation. Export either format to keep all three targets.
 
 ## Public and full editions
 
